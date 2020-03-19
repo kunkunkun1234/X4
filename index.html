@@ -1,147 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
-    <script id='autoAdsMaxLead-widget-script' src='https://cdn.autoads.asia/scripts/autoads-maxlead-widget.js?business_id=8DAE0E12348B4ED48B54FBA185452DD8' type='text/javascript' charset='UTF-8' async></script>                
-</head>
-<style>
-    .center_div {
-        margin: 0 auto;
-        width: 60%
-    }
-</style>
-
-<body>
-    <div class="container center_div">
-        <div class="row">
-            <form class="w-100 pt-5">
-                <div class="form-group">
-                    <label>Type your words here</label>
-                    <textarea id="input" class="form-control" placeholder="your words..." rows="4"></textarea>
-                </div>
-                <div class="form-check mb-1">
-                    <input type="checkbox" class="form-check-input " id="cbIncludeBrTag">
-                    <label class="form-check-label" for="cbIncludeBrTag">Include br tag</label>
-                </div>
-                <button id="btnTranslate" class="btn btn-primary">Submit</button>
-                <div class="form-group">
-                </div>
-                <div class="form-group">
-                    <label>Output</label>
-                    <textarea id="output" class="form-control" placeholder="Output data here..." rows="3"></textarea>
-                </div>
-                <button id="btnCopy" type="button" class="btn btn-outline-primary mr-2"
-                    onclick="copyText(); return false;">Copy</button>
-            </form>
-        </div>
-    </div>
-</body>
-<script>
-    function copyText() {
-        /* Get the text field */
-        let copyText = document.getElementById("output");
-
-        /* Select the text field */
-        copyText.select();
-        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-
-        /* Copy the text inside the text field */
-        document.execCommand("copy");
-
-        /* Alert the copied text */
-        toastr.success("Copied!", "", { timeOut: 300 });
-
-    };
-
-    function translate() {
-        $("#output").val("Processing...");
-        let inputData = $("#input").val().replace(/\r?\n|\r/g, "");
-        let arrWords = inputData.split(" ");
-        let outputData = [];
-        arrWords.forEach(element => {
-            let apiUri = `https://translate-api198.herokuapp.com/api/translate?from=en&to=vi&content=${element}`;
-            if (element !== "") {
-                getDataFromApi(apiUri, element, outputData);
-            }
-            else {
-                $("#output").val("");
-            }
-        });
-
-        $(document).ajaxStop(function () {
-            // code to be executed on completion of last outstanding ajax call
-            setOutputTextboxValue(outputData);
-        });
-    };
-
-    function getDataFromApi(apiUri, originalWord, outputData) {
-        return $.ajax({
-            type: 'GET',
-            url: apiUri,
-            contentType: 'text/plain',
-            xhrFields: {
-                // The 'xhrFields' property sets additional fields on the XMLHttpRequest.
-                // This can be used to set the 'withCredentials' property.
-                // Set the value to 'true' if you'd like to pass cookies to the server.
-                // If this is enabled, your server must respond with the header
-                // 'Access-Control-Allow-Credentials: true'.
-                withCredentials: false
-            },
-            success: function (res) {
-                pushDataToOutputArray(res, originalWord, outputData);
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-    };
-
-    function pushDataToOutputArray(res, originalWord, outputData) {
-        if (res.msg !== "success")
-            return;
-
-        outputData.push({
-            wordToTranslate: originalWord,
-            type: res.data.more.type || "",
-            pronunciation: res.data.pronunciation ? res.data.pronunciation.split(",")[1] : "",
-            wordTranslated: res.data.text
-        });
-    };
-
-    function setOutputTextboxValue(outputData) {
-        let output = "";
-        let includeBrTag = $("#cbIncludeBrTag").val();
-        outputData.forEach(element => {
-            output += element.wordToTranslate +
-                (element.type.length > 0 ? (" (" + element.type + "): ") : ": ") +
-                element.wordTranslated +
-                ($('#cbIncludeBrTag').is(":checked") ? "<br/>" : "") +
-                " \n";
-        });
-        $("#output").val(output);
-    };
-
-    $(document).ready(function () {
-        $("form").submit(function () {
-            translate();
-            return false;
-        });
-    });
-</script>
-
+<!doctype html>
+<html amp lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <title>Hello, AMPs</title>
+    <link rel="canonical" href="https://amp.dev/documentation/guides-and-tutorials/start/create/basic_markup/">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org",
+        "@type": "NewsArticle",
+        "headline": "Open-source framework for publishing content",
+        "datePublished": "2015-10-07T12:02:41Z",
+        "image": [
+          "logo.jpg"
+        ]
+      }
+    </script>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+  </head>
+  <body>
+    <h1>Welcome to the mobile web</h1>
+  </body>
 </html>
