@@ -26,9 +26,12 @@
 
 var CommonModule = (function () {
     const translateApiUrl = "https://translate.yandex.net/api/v1.5/tr.json/translate";
-    function CopyText(id) {
+    let data = {};
+
+    function CopyText(id, val) {
         let value = $("#" + id).text();
-        $("#TxtCopyText").val(value.replace(/<br>/g,"<br>\r"));
+        if (val) { value = val; }
+        $("#TxtCopyText").val(value.replace(/<br>/g, "<br>\r"));
         var copyText = document.getElementById("TxtCopyText");
         copyText.select();
         copyText.setSelectionRange(0, 99999)
@@ -44,17 +47,23 @@ var CommonModule = (function () {
 
         console.log(request);
         $.get(translateApiUrl, request)
-            .done(function (data) {
-                callback(data);
-            })
-            .fail(function (data) {
-                console.error(data);
-            })
+            .done(function (data) { callback(data); })
+            .fail(function (data) { console.error(data); })
+    }
+
+    function SetData(key, value) {
+        data[key] = value;
+    }
+
+    function GetData(key) {
+        return data[key];
     }
 
     return {
         copy: CopyText,
-        translate: Translate
+        translate: Translate,
+        setData: SetData,
+        getData: GetData
     }
 })();
 
@@ -195,10 +204,13 @@ var TableModule = (function (commonModule) {
     function _generateHtml(part, listContent) {
         let output = `
         <tr>
-            <td rowspan="${listContent.length}">${part}</td>
+            <td rowspan="${listContent.length}" style="text-align:center;vertical-align: middle">
+                ${part}
+                <button type="button" class="btn btn-secondary" onclick="CommonModule.copy(null, CommonModule.getData('${part}'))"><i class="far fa-clipboard mr-1"></i>  Copy all</button>
+            </td>
             <td id="content${orderNumber}">${listContent[0]}</td>
             <td>
-                <button type="button" class="btn btn-primary" onclick="CommonModule.copy('content${orderNumber}')">Copy</button>
+                <button type="button" class="btn btn-primary" onclick="CommonModule.copy('content${orderNumber}')"><i class="far fa-copy"></i> Copy</button>
             </td>
         </tr>`;
         orderNumber++;
@@ -208,16 +220,17 @@ var TableModule = (function (commonModule) {
             <tr>
                 <td id="content${orderNumber}">${listContent[i]}</td>
                 <td>
-                    <button type="button" class="btn btn-primary" onclick="CommonModule.copy('content${orderNumber}')">Copy</button>
+                    <button type="button" class="btn btn-primary" onclick="CommonModule.copy('content${orderNumber}')"><i class="far fa-copy"></i> Copy</button>
                 </td>
             </tr>`;
             orderNumber++;
         }
+
+        CommonModule.setData(part, listContent.join(" <br> "));
         return output;
     }
 
     function _updateVocab() {
-        console.log($("#SpeakOutLoud textarea").val());
         let output = "";
         let listWords = $("#SpeakOutLoud textarea").val().split(/\s/g);
         for (let i = 0; i < listWords.length; i++) {
@@ -230,7 +243,6 @@ var TableModule = (function (commonModule) {
         }
 
         setTimeout(function () {
-            console.log("here");
             $("#content" + vocabIndex).empty();
             $("#content" + vocabIndex).append(output);
         }, 3000);
